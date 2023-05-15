@@ -8,4 +8,5 @@
   "gitpod.openInStable.neverPrompt": true,
   "redhat.telemetry.enabled": true,
   "vsicons.dontShowNewVersionMessage": true,
+  "haskell.manageHLS": "GHCup",
 }

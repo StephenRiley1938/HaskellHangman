@@ -2,6 +2,8 @@ module Main where
 
 import System.IO
 
+import A6
+import A7
 import A8
 import Provided
 

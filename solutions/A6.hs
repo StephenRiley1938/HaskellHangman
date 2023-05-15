@@ -3,35 +3,57 @@ module A6 where
 import Provided
 
 import Data.List ( intersperse, sort )
+import Data.Char (isLetter)
 
 -- *** A6-0: WARM-UP *** --
 
 -- Q#01
-
+type Chances = Int
+type Guess = String
+type Move = Char
+type Secret = String
+type Dictionary = String
 
 -- Q#02
-data GameException
+data GameException = InvalidWord | InvalidMove | RepeatMove | GameOver
 
 -- Q#03
 
-lengthInRange = undefined
+lengthInRange :: Secret -> Bool
+lengthInRange ss = l >= fst _LENGTH_ && l <= snd _LENGTH_
+  where l = length ss
 
 -- Q#04
 
-invalidMove = undefined
+invalidMove :: Move -> Bool
+invalidMove m = (not . isLetter) m
 
 -- Q#05
 
-revealLetters = undefined
+revealLetters :: Move -> Secret -> Guess -> Guess
+revealLetters m s g = zipWith (\s g -> if s == m && g == '_' then m else g) s g
+
+{-
+m = 'b'
+secret = "abcdef"
+guessIn = "______"
+revealLetters 'f' "abcdef" (revealLetters 'c' "abcdef" "______")
+-}
 
 -- Q#06
-
-updateChances = undefined
+updateChances :: Move -> Secret -> Chances -> Chances
+updateChances m s c = if elem m s then c else c - 1
 
 -- Q#07
 
-setSecret = undefined
-
+setSecret :: IO Secret
+setSecret = do
+  putStr "Enter a secret word:\t"
+  showInput False
+  secret <- getLine
+  showInput True
+  _SPACE_
+  return secret
 
 -- *** A6-1: Records & Instances *** --
 

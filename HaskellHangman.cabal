@@ -28,7 +28,7 @@ executable HaskellHangman
                     , Sandbox
 
     build-depends:
-        base ^>=4.14.1.0
+        base ^>=4.16.4.0
       , directory
       , mtl >= 2.3
 

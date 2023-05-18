@@ -2,8 +2,8 @@ module A6 where
 
 import Provided
 
-import Data.List ( intersperse, sort )
-import Data.Char (isLetter)
+import Data.List(intersperse, sort)
+import Data.Char(isLetter, isAlpha, toLower, toUpper)
 
 -- *** A6-0: WARM-UP *** --
 
@@ -31,7 +31,7 @@ invalidMove m = (not . isLetter) m
 -- Q#05
 
 revealLetters :: Move -> Secret -> Guess -> Guess
-revealLetters m s g = zipWith (\s g -> if s == m && g == '_' then m else g) s g
+revealLetters m s g = zipWith(\s g -> if s == m && g == '_' then m else g) s g
 
 {-
 m = 'b'

@@ -1,3 +1,4 @@
+{-# LANGUAGE InstanceSigs #-} 
 module A6 where
 
 import Provided
@@ -15,7 +16,8 @@ type Secret = String
 type Dictionary = String
 
 -- Q#02
-data GameException = InvalidWord | InvalidMove | RepeatMove | GameOver
+
+data GameException = InvalidWord | InvalidChars | InvalidLength | NotInDict | RepeatMove | GameOver
 
 -- Q#03
 
@@ -58,22 +60,35 @@ setSecret = do
 -- *** A6-1: Records & Instances *** --
 
 -- Q#08
-data Game
+data Game = Game {  getSecret :: Secret,
+                    getCurrentGuess :: Guess,
+                    getMovesMade :: [Move],
+                    getChancesRemaining :: Chances
+                    } -- deriving Show
 
 -- Q#09
 
-repeatedMove = undefined
+repeatedMove :: Move -> Game -> Bool
+repeatedMove m g = elem m $ getMovesMade g
 
 -- Q#10
 
-makeGame = undefined
+makeGame :: Secret -> Game
+makeGame s = Game { getSecret = map toUpper s,
+                    getCurrentGuess = replicate (length s) '_',
+                    getMovesMade = [],
+                    getChancesRemaining = _CHANCES_
+                    }
 
 -- Q#11
 
-updateGame = undefined
+updateGame :: Move -> Game -> Game
+updateGame m g = g {  getCurrentGuess = revealLetters m (getSecret g) (getCurrentGuess g),
+                      getMovesMade = m:(getMovesMade g),
+                      getChancesRemaining = updateChances m (getSecret g) (getChancesRemaining g)
+                      }
 
 -- Q#12
-
 showGameHelper :: String -> [Char] -> Int -> String
 showGameHelper game moves chances = unlines [
       _STARS_
@@ -83,36 +98,78 @@ showGameHelper game moves chances = unlines [
     , _STARS_
     ]
 
+instance Show Game where
+  show :: Game -> String
+  show (Game s _ m c) = showGameHelper s m c
 
 -- Q#13
 
+instance Show GameException where
+  show :: GameException -> String
+
+  show InvalidWord = "GameException: InvalidWord."
+
+  show InvalidChars = "GameException: InvalidChars. Must be a letter."
+
+  show InvalidLength = "GameException: InvalidLength. Must be from " ++ lb ++ " to " ++ ub ++ " chracters."
+    where
+      lb = show $ fst _LENGTH_
+      ub = show $ snd _LENGTH_
+
+  show NotInDict = "GameException: NotInDict."
+
+  show RepeatMove = "GameException: RepeatMove."
+
+  show GameOver = "GameException: GameOver."
+
+-- data GameException = InvalidWord | InvalidChars | InvalidLength | NotInDict | RepeatMove | GameOver
 
 -- *** A6-2: Exception Contexts *** --
 
 -- Q#14
 
-toMaybe = undefined
+toMaybe :: Bool -> a -> Maybe a
+toMaybe tf a
+    | not tf = Nothing
+    | otherwise = Just a
 
 -- Q#15
-
-validateSecret = undefined
+validateSecret :: (Secret -> Bool) -> GameException-> Secret -> Either GameException Secret
+validateSecret f e s = if (f s) then Right s else Left e
 
 -- Q#16
 
-hasValidChars = undefined
+hasValidChars :: Secret -> Either GameException Secret
+hasValidChars = validateSecret (\str -> foldl (&&) True (map isLetter str)) InvalidChars
 
+isValidLength :: Secret -> Either GameException Secret
+isValidLength = validateSecret lengthInRange InvalidLength
 
-isValidLength = undefined
-
-
-isInDict = undefined
+isInDict :: Dictionary -> Secret -> Either GameException Secret
+isInDict dict = validateSecret (\str -> foldl (&&) True (map (\c -> (elem c dict)) (map toLower str))) NotInDict
 
 -- Q#17
 
-validateNoDict = undefined
+validateNoDict :: Secret -> Either GameException Secret
+validateNoDict s = case hasValidChars s of
+                    Right s2 -> case isValidLength s2 of
+                                  Right s3 -> Right s3
+                                  Left err2 -> Left err2
+                    Left err -> Left err
 
-validateWithDict = undefined
+validateWithDict :: Dictionary -> Secret -> Either GameException Secret
+validateWithDict d s = case validateNoDict s of
+                        Right s2 -> case isInDict d s of
+                                      Right s3 -> Right s3
+                                      Left err2 -> Left err2
+                        Left err -> Left err
 
 -- Q#18
 
-processTurn = undefined
+processTurn :: Move -> Game -> Either GameException Game
+processTurn m g
+  | invalidMove m = Left InvalidChars
+  | repeatedMove m g = Left RepeatMove
+  | getChancesRemaining newGame == 0 = Left GameOver
+  | otherwise = Right newGame
+  where newGame = updateGame m g

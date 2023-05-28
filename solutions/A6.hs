@@ -13,7 +13,7 @@ type Chances = Int
 type Guess = String
 type Move = Char
 type Secret = String
-type Dictionary = String
+type Dictionary = [String]
 
 -- Q#02
 
@@ -146,7 +146,7 @@ isValidLength :: Secret -> Either GameException Secret
 isValidLength = validateSecret lengthInRange InvalidLength
 
 isInDict :: Dictionary -> Secret -> Either GameException Secret
-isInDict dict = validateSecret (\str -> foldl (&&) True (map (\c -> (elem c dict)) (map toLower str))) NotInDict
+isInDict dict = validateSecret (\str -> (elem (map toLower str) dict)) NotInDict
 
 -- Q#17
 

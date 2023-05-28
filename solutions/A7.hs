@@ -10,16 +10,31 @@ import System.Directory ( doesFileExist )
 
 -- Q#01
 
-getUpperChar = undefined
+getUpperChar :: IO Char
+--getUpperChar = getChar >>= (\c -> return (toUpper c))
+--getUpperChar = fmap toUpper getChar
+getUpperChar = toUpper <$> getChar
 
 -- Q#02
 
-_DICT_ = undefined
+_DICT_ :: IO [String]
+--_DICT_ = readFile _DICT_FILE_ >>= (\w -> return (words w))
+--_DICT_ = fmap words (readFile _DICT_FILE_)
+_DICT_ = words <$> readFile _DICT_FILE_
 
 -- Q#03
-
-makeGameIfValid = undefined
+--makeGame :: Secret -> Game
+makeGameIfValid :: Either GameException Secret -> Either GameException Game
+--makeGameIfValid (Left err) = Left err
+--makeGameIfValid (Right s) = Right (makeGame s)
+makeGameIfValid x = makeGame <$> x
 
 -- Q#04
-
-getDict = undefined
+--toMaybe :: Bool -> a -> Maybe a
+type DictionaryWords = [String]
+getDict :: IO (Maybe DictionaryWords)
+getDict =
+    let io_exists = doesFileExist _DICT_FILE_
+        m_exists = toMaybe <$> io_exists
+    in
+        m_exists <*> _DICT_

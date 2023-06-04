@@ -32,8 +32,12 @@ makeGameIfValid x = makeGame <$> x
 -- Q#04
 --toMaybe :: Bool -> a -> Maybe a
 getDict :: IO (Maybe Dictionary)
+{-
 getDict =
     let io_exists = doesFileExist _DICT_FILE_
         m_exists = toMaybe <$> io_exists
     in
         m_exists <*> _DICT_
+        -}
+getDict = toMaybe <$> doesFileExist _DICT_FILE_ <*> _DICT_    
+        

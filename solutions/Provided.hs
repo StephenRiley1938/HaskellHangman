@@ -37,7 +37,10 @@ _LENGTH_ :: (Int, Int)
 _LENGTH_ = (3, 20)
 
 _DICT_FILE_ :: FilePath
-_DICT_FILE_ = "assets/dict.txt"
+--_DICT_FILE_ = "assets/dict.txt"
+--_DICT_FILE_ = "assets/dict_test.txt"
+_DICT_FILE_ = "assets/_dict_test.txt"
+
 
 promptGuess :: IO ()
 promptGuess = putStr "Guess?\t"
